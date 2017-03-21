@@ -3,11 +3,14 @@ import {
   StyleSheet,
   View,
   Text,
-  ListView
+  ListView,
+  Image
 } from 'react-native'
-
+import moment from 'moment'
 import Header from './Header';
 import Footer from './Footer';
+
+const icon = require('../images/money.png');
 
 export default class ExpenseList extends Component {
   constructor(props) {
@@ -16,25 +19,34 @@ export default class ExpenseList extends Component {
 
   renderList() {
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
-    function renderRow(rowData) {
-      return (
-        <View style={styles.listViewContainer}>
-          <Text style={styles.expenseDescription}>{rowData.description}</Text>
-          <Text>{rowData.amount}</Text>
-        </View>
-      )
-    }
 
     return (
       <ListView
+        style={styles.listView}
         dataSource={ds.cloneWithRows(this.props.expenses)}
         renderRow={renderRow}
       />
     )
+
+    function renderRow(rowData) {
+      return (
+        <View style={styles.listViewRowContainer}>
+          <View style={styles.iconColumn}>
+            <Image style={styles.icon} source={icon} />
+          </View>
+          <View style={styles.rowColumn}>
+            <Text style={styles.rowItemText}>{rowData.description}</Text>
+          </View>
+          <View style={styles.rowColumn}>
+            <Text style={styles.rowItemText}>{rowData.amount}</Text>
+          </View>
+        </View>
+      )
+    }
+
   }
 
   computeTotal() {
-    console.log('mon was here')
     let total = this.props.expenses.map( function(expense) {
       return expense.amount
     }).reduce(function(acc, val) {
@@ -48,7 +60,8 @@ export default class ExpenseList extends Component {
       <View style={styles.container}>
         <Header />
         <View style={styles.list}>
-          <Text style={styles.totalExpense}>Total Expense for today: {this.computeTotal()}</Text>
+          <Text style={styles.date}>{moment().format('MMMM Do YYYY')}</Text>
+          <Text style={styles.total}>Total Expense: {this.computeTotal()}</Text>
           {this.renderList()}
         </View>
         <Footer />
@@ -64,20 +77,39 @@ const styles = StyleSheet.create({
   },
   list: {
     flex: 17,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginTop: 20,
-  },
-  listViewContainer: {
-    flex: 1,
-    flexDirection: 'row'
-  },
-  expenseDescription: {
+    marginLeft: 10,
     marginRight: 10,
-    marginBottom: 10
   },
-  totalExpense: {
+  listView: {
+    flex: 1
+  },
+  listViewRowContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: '#dcdcdc',
+  },
+  rowColumn: {
+    flex: 1,
+  },
+  iconColumn: {
+    flex: .1
+  },
+  rowItemText: {
+    fontSize: 11
+  },
+  total: {
     marginBottom: 10,
-    fontWeight: '900'
+    fontWeight: '900',
+    fontSize: 11
+  },
+  date: {
+    fontWeight: '900',
+    color: '#255e5e'
+  },
+  icon: {
+    height: 13,
+    width: 13
   }
 });
